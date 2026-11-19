@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Generated data
+data/raw/*.csv
+data/processed/*.csv
+
+# Model files
+models/*.joblib
+models/*.pkl
+
+# Generated outputs
+reports/*.csv
+reports/*.json
+reports/figures/*.png
+
+# Local configuration
+.env
+*.log
+
+# Operating system
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/

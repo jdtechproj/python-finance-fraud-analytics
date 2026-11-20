@@ -5,6 +5,8 @@ from pathlib import Path
 import joblib
 import pandas as pd
 
+import matplotlib.pyplot as plt
+
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
@@ -121,6 +123,52 @@ def main():
 
     model.fit(X_train, y_train)
 
+    feature_names = (
+        model.named_steps["preprocessor"]
+        .get_feature_names_out()
+    )
+
+    importance = (
+        model.named_steps["classifier"]
+        .feature_importances_
+    )
+
+    importance_df = pd.DataFrame({
+        "feature": feature_names,
+        "importance": importance
+    }).sort_values(
+        "importance",
+        ascending=False
+    )
+
+    importance_df.to_csv(
+        "reports/feature_importance.csv",
+        index=False
+    )
+
+    top_features = importance_df.head(10)
+
+    plt.figure(figsize=(10, 6))
+
+    plt.barh(
+        top_features["feature"],
+        top_features["importance"]
+    )
+
+    plt.gca().invert_yaxis()
+
+    plt.title("Top 10 Fraud Detection Features")
+    plt.xlabel("Feature Importance")
+
+    plt.tight_layout()
+
+    plt.savefig(
+        "reports/figures/feature_importance.png",
+        dpi=150
+    )
+
+    plt.show()
+
     validation_probabilities = model.predict_proba(
         X_validation
     )[:, 1]
@@ -174,7 +222,7 @@ def main():
 
     predictions_df = test_df[
         ["transaction_id", "customer_id",
-         "transaction_timestamp", "amount"]
+         "transaction_timestamp", "amount", "channel"]
     ].copy()
 
     predictions_df["actual_fraud"] = y_test.values
